@@ -96,13 +96,21 @@ read_data() {
     GENRE=${myArray[GENRE_COL - 1]}
     RELEASE_YEAR=${myArray[RELEASE_YEAR_COL - 1]}
     PREV_URL=${myArray[PREV_URL_COL - 1]}
-
     GENRE_ARRAY=(${GENRE})
-
     ALBUM_NAME_FORMATTED=$(echo "$ALBUM_NAME" | tr ' ' '_')
     ARTIST_FORMATTED=$(echo "$ARTIST" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
     GENRE_FORMATTED=$(echo "$GENRE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
     FEAT_ARTIST_FORMATTED=$(echo "$FEAT_ARTIST" | tr ' ' '_')
+    if [[ $FEAT_ARTIST_FORMATTED != 'None' ]]; then
+        SONG_NAME_FORMATTED="${SONG_NAME}_(ft._${FEAT_ARTIST_FORMATTED})"
+    else
+        SONG_NAME_FORMATTED="${SONG_NAME}"
+    fi
+
+    ARTIST_FOLDER_NAME=$ARTIST_FORMATTED
+    FILE_NAME="${RELEASE_YEAR}_-_${ALBUM_NAME_FORMATTED}_(${ALBUM_TYPE})"
+    ENTRY="${SONG_NAME_FORMATTED}: ${PREV_URL}"
+    
 
     # echo "Entry Number: $ENTRY_NUMBER"
     # echo "ALBUM_TYPE: $ALBUM_TYPE"
@@ -117,14 +125,9 @@ read_data() {
     # echo "ARTIST_FORMATTED: $ARTIST_FORMATTED"
     # echo "GENRE_FORMATTED: $GENRE_FORMATTED"
     # echo "FEAT_ARTIST_FORMATTED: $FEAT_ARTIST_FORMATTED"
-
-    ARTIST_FOLDER_NAME=$ARTIST_FORMATTED
-    FILE_NAME="${RELEASE_YEAR}_-_${ALBUM_NAME_FORMATTED}_(${ALBUM_TYPE})"
-    ENTRY="${SONG_NAME}: ${PREV_URL}"
-
-    echo "ARTIST_FOLDER_NAME : $ARTIST_FOLDER_NAME"
-    echo "FILE_NAME : $FILE_NAME"
-    echo "ENTRY : $ENTRY"
+    # echo "ARTIST_FOLDER_NAME : $ARTIST_FOLDER_NAME"
+    # echo "FILE_NAME : $FILE_NAME"
+    # echo "ENTRY : $ENTRY"
 
     punk_count=0
     pop_count=0
@@ -133,51 +136,68 @@ read_data() {
 
     if [[ " ${GENRE_ARRAY[@]} " =~ " ${PUNK} " ]]; then
         punk_count=1
-        parent_folder="punk"
     fi
 
     if [[ " ${GENRE_ARRAY[@]} " =~ " ${POP} " ]]; then
         pop_count=1
-        parent_folder="pop"
     fi
 
     if [[ " ${GENRE_ARRAY[@]} " =~ " ${INDIE} " ]]; then
         indie_count=1
-        parent_folder="indie"
     fi
 
     if [[ " ${GENRE_ARRAY[@]} " =~ " ${ROCK} " ]]; then
         rock_count=1
-        parent_folder="rock"
     fi
 
     net_count=$((punk_count + pop_count + indie_count + rock_count))
-    echo "Net Count : $net_count"
 
     if [ $net_count == 0 ]; then
-        echo "Normal Case"
         mkdir -p "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
         touch "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}" 
         echo "$ENTRY" >>"${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
     fi
 
     if [ $net_count == 1 ]; then
-        echo "Special Case 1"
         mkdir -p "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
         touch "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}" 
         echo "$ENTRY" >>"${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
     fi
 
     if [ $net_count == 2 ]; then
-        echo "Special Case 2"
-        mkdir -p "${parent_folder}/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
-        touch "${parent_folder}/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
-        echo "$ENTRY" >>"${parent_folder}/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
-    fi
 
-    echo "------------------------------------------------------------------------------"
+        if [ $punk_count == 1 ]; then
+            
+            mkdir -p "punk/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
+            touch "punk/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+            echo "$ENTRY" >>"punk/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+        fi
+
+        if [ $pop_count == 1 ]; then
+            
+            mkdir -p "pop/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
+            touch "pop/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+            echo "$ENTRY" >>"pop/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+        fi
+
+        if [ $indie_count == 1 ]; then
+            
+            mkdir -p "indie/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
+            touch "indie/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+            echo "$ENTRY" >>"indie/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+        fi
+
+        if [ $rock_count == 1 ]; then
+            
+            mkdir -p "rock/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
+            touch "rock/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+            echo "$ENTRY" >>"rock/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+        fi
+    fi
 }
 
+echo "Script running ..."
 mkdir -p music && cd music
 create_directory_structure
 read_each_line_of_file
+echo "Done"
