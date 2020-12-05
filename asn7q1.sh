@@ -200,4 +200,6 @@ echo "Script running ..."
 mkdir -p music && cd music
 create_directory_structure
 read_each_line_of_file
+cd ..
+zip -r music.zip music> zip-output.txt
 echo "Done"
