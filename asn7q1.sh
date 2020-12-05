@@ -103,21 +103,28 @@ read_data() {
     ARTIST_FORMATTED=$(echo "$ARTIST" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
     GENRE_FORMATTED=$(echo "$GENRE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
     FEAT_ARTIST_FORMATTED=$(echo "$FEAT_ARTIST" | tr ' ' '_')
-    
-    echo "Entry Number: $ENTRY_NUMBER"
-    echo "ALBUM_TYPE: $ALBUM_TYPE"
-    echo "ALBUM_NAME: $ALBUM_NAME"
-    echo "ARTIST: $ARTIST"
-    echo "FEAT_ARTIST: $FEAT_ARTIST"
-    echo "SONG_NAME: $SONG_NAME"
-    echo "GENRE: $GENRE"
-    echo "RELEASE_YEAR: $RELEASE_YEAR"
-    echo "PREV_URL: $PREV_URL"
 
-    echo "ALBUM_NAME_FORMATTED: $ALBUM_NAME_FORMATTED"
-    echo "ARTIST_FORMATTED: $ARTIST_FORMATTED"
-    echo "GENRE_FORMATTED: $GENRE_FORMATTED"
-    echo "FEAT_ARTIST_FORMATTED: $FEAT_ARTIST_FORMATTED"
+    # echo "Entry Number: $ENTRY_NUMBER"
+    # echo "ALBUM_TYPE: $ALBUM_TYPE"
+    # echo "ALBUM_NAME: $ALBUM_NAME"
+    # echo "ARTIST: $ARTIST"
+    # echo "FEAT_ARTIST: $FEAT_ARTIST"
+    # echo "SONG_NAME: $SONG_NAME"
+    # echo "GENRE: $GENRE"
+    # echo "RELEASE_YEAR: $RELEASE_YEAR"
+    # echo "PREV_URL: $PREV_URL"
+    # echo "ALBUM_NAME_FORMATTED: $ALBUM_NAME_FORMATTED"
+    # echo "ARTIST_FORMATTED: $ARTIST_FORMATTED"
+    # echo "GENRE_FORMATTED: $GENRE_FORMATTED"
+    # echo "FEAT_ARTIST_FORMATTED: $FEAT_ARTIST_FORMATTED"
+
+    ARTIST_FOLDER_NAME=$ARTIST_FORMATTED
+    FILE_NAME="${RELEASE_YEAR}_-_${ALBUM_NAME_FORMATTED}_(${ALBUM_TYPE})"
+    ENTRY="${SONG_NAME}: ${PREV_URL}"
+
+    echo "ARTIST_FOLDER_NAME : $ARTIST_FOLDER_NAME"
+    echo "FILE_NAME : $FILE_NAME"
+    echo "ENTRY : $ENTRY"
 
     punk_count=0
     pop_count=0
@@ -144,14 +151,32 @@ read_data() {
         parent_folder="rock"
     fi
 
-    echo "Punk Count : $punk_count"
-    echo "Pop Count : $pop_count"
-    echo "Indie Count : $indie_count"
-    echo "Rock Count : $rock_count"
+    net_count=$((punk_count + pop_count + indie_count + rock_count))
+    echo "Net Count : $net_count"
+
+    if [ $net_count == 0 ]; then
+        echo "Normal Case"
+        mkdir -p "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
+        touch "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}" 
+        echo "$ENTRY" >>"${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+    fi
+
+    if [ $net_count == 1 ]; then
+        echo "Special Case 1"
+        mkdir -p "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
+        touch "${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}" 
+        echo "$ENTRY" >>"${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+    fi
+
+    if [ $net_count == 2 ]; then
+        echo "Special Case 2"
+        mkdir -p "${parent_folder}/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}"
+        touch "${parent_folder}/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+        echo "$ENTRY" >>"${parent_folder}/${GENRE_FORMATTED}/${ARTIST_FOLDER_NAME}/${FILE_NAME}"
+    fi
 
     echo "------------------------------------------------------------------------------"
 }
-
 
 mkdir -p music && cd music
 create_directory_structure
